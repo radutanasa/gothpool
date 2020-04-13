@@ -43,9 +43,9 @@ A `Run()` call on a stopped pool will return an `ExecPoolStoppedErr` error.
 
 The pool can be restarted by calling the `Start()` function.
 
-**IMPORTANT:** Data sent to the executor should be immutable!
+**IMPORTANT:** Variables sent to the executor should not change!
 
-This code results in an unexpected behavior:
+This code results in an unexpected behavior, as `i` references different values:
 ``` go
 for i:=0; i<10; i++ {
     exec.Run(func() {
