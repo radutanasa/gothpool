@@ -15,7 +15,7 @@ func TestExecPool(t *testing.T) {
 	for i := 0; i < 20; i++ {
 		var j = i
 		err := exec.Run(func() {
-			PrintWithDelay(j)
+			PrintValue(j)
 		})
 		if err != nil {
 			t.Error("Pool should not be stopped at this point.", err)
@@ -32,6 +32,6 @@ func TestExecPool(t *testing.T) {
 	}
 }
 
-func PrintWithDelay(value int) {
+func PrintValue(value int) {
 	println(value)
 }
