@@ -9,18 +9,29 @@ import (
 func TestExecPool(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
-	exec := New(4, 1000)
+	exec := New(4, 10e5)
 	exec.Start()
-	defer exec.Stop()
 
-	for i := 0; i < 10000; i++ {
-		exec.Run(func() {
-			PrintWithDelay(rand.Intn(100))
+	for i := 0; i < 20; i++ {
+		var j = i
+		err := exec.Run(func() {
+			PrintWithDelay(j)
 		})
+		if err != nil {
+			t.Error("Pool should not be stopped at this point.", err)
+		}
+	}
+
+	exec.Stop()
+
+	err := exec.Run(func() {
+		t.Error("This should never run as the pool is stopped.")
+	})
+	if err == ExecPoolStoppedErr {
+		t.Log("Correct behavior - pool is stopped and can't accept new jobs.")
 	}
 }
 
-func PrintWithDelay(delay int) {
-	time.Sleep(time.Duration(delay) * time.Millisecond)
-	println(delay)
+func PrintWithDelay(value int) {
+	println(value)
 }

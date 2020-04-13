@@ -1,10 +1,14 @@
 package gothpool
 
+import "errors"
+
 type ExecPool struct {
 	limiter chan bool
 	queue   chan func()
 	on      bool
 }
+
+var ExecPoolStoppedErr = errors.New("executor pool is stopped")
 
 func New(parallelism int64, queueSize int64) *ExecPool {
 	return &ExecPool{
@@ -17,7 +21,7 @@ func (ep *ExecPool) Start() {
 	ep.on = true
 	go func() {
 		for {
-			if !ep.on {
+			if !ep.on && len(ep.queue) == 0 {
 				break
 			}
 			select {
@@ -33,7 +37,11 @@ func (ep *ExecPool) Stop() {
 	ep.on = false
 }
 
-func (ep *ExecPool) Run(f func()) {
+func (ep *ExecPool) Run(f func()) error {
+	if !ep.on {
+		return ExecPoolStoppedErr
+	}
 	ep.limiter <- true
 	ep.queue <- f
+	return nil
 }
