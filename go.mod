@@ -1,3 +1,3 @@
-module gothpool
+module github.com/radutanasa/gothpool
 
 go 1.13
